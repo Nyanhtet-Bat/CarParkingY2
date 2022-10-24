@@ -1,6 +1,6 @@
 # Car Parking (webdataproject)
 
-This is about laptop renting webpage
+This is about car parking webpage
 
 ## Install the dependencies
 ```bash
