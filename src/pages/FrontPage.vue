@@ -17,7 +17,7 @@
                   transition-show="scale"
                   transition-hide="scale"
                 >
-                  <q-date v-model="date1" mask="YYYY-MM-DD HH:mm">
+                  <q-date v-model="date1" mask="YYYY-MM-DD HH:mm" :options="optionfn">
                     <div class="row items-center justify-end">
                       <q-btn v-close-popup label="Close" color="primary" flat />
                     </div>
@@ -161,6 +161,9 @@ export default defineComponent({
         this.storeCustomer.fees = fees;
       }
     },
+    optionfn(date1){
+      return date1 >= Date.now()
+    }
   },
 });
 </script>

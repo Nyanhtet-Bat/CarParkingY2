@@ -1,23 +1,4 @@
 <template>
-  <q-form @submit.prevent="onSubmit" class="q-gutter-md" ref="myLoginForm">
-    <q-input v-model="date" filled type="date" hint="Native date" />
-
-    <div>
-      <q-select
-        standout
-        v-model="time"
-        :options="options"
-        label="Choose your hour!    "
-        display-value-html
-        :display-value="time ? `<strong>${time.label}</strong>` : ''"
-      />
-    </div>
-
-    <div>
-      <q-btn color="deep-orange" glossy label="Submit" type="submit" />
-    </div>
-  </q-form>
-
   <q-table
     title="Customer Details"
     :rows="customers"
@@ -58,12 +39,7 @@ export default defineComponent({
   },
   methods: {
     onSubmit() {
-      this.customers.push({
-        id: this.id++,
-        date: this.date,
-        time: this.time.hour,
-        fee: this.time.fees,
-      });
+      
       this.storeCustomer.date = this.date;
 
       this.storeCustomer.time = this.time.hour;
