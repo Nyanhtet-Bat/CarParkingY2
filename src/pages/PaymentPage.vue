@@ -1,10 +1,27 @@
 <template>
   <q-page padding>
-    <!-- <div>
-    <q-btn color="primary" icon="check" 
-    label="OK" 
-    @click="showErrDialog('This is an example error.')" />
-  </div> -->
+    <h3 align="center">Admin Dashboard for Total, Count and Payment</h3>
+
+    <q-card class="mycard" >
+      <div>Date : {{ date }}</div>
+      <div 
+      v-for="sumTotal in sumTotals"
+      :key="sumTotal.total" 
+      :value="sumTotal">Total Sum : {{ sumTotal.total }}</div>
+    
+
+    <div 
+      v-for="pendingCount in pendingCounts"
+      :key="pendingCount.pend" 
+      :value="pendingCount">Total Pending : {{ pendingCount.pend }}</div>
+    
+
+    <div 
+      v-for="rejectCount in rejectCounts"
+      :key="rejectCount.total" 
+      :value="rejectCount">Total Reject : {{ rejectCount.reject }}</div>
+    </q-card>
+    <br/>
     <div v-if="dataReady">
       <!-- display qtable -->
       <q-table
@@ -36,53 +53,12 @@
                 round
                 @click="editRecord(props.row)"
               />
-              <!-- <q-btn
-                  color="primary"
-                  icon="delete"
-                  flat
-                  round
-                  @click="deleteRecord(props.row)"
-                /> -->
             </q-td>
           </q-tr>
         </template>
       </q-table>
 
       <br />
-      <!-- <q-table
-        title="List of Methods"
-        :rows="rows1"
-        :columns="columns1"
-        row-key="id"
-        :pagination="paginations"
-      >
-        <template #body="props">
-          <q-tr :props="props">
-            <q-td key="id" :props="props">
-              {{ props.row.id }}
-            </q-td>
-
-            <q-td key="name" :props="props">
-              {{ props.row.name }}
-            </q-td>
-
-            <q-td key="actions">
-              <q-btn
-                outline
-                style="color: darkblue"
-                label="Completed"
-                @click="updateMethod(props.row)"
-              />
-              <q-btn
-                outline
-                style="color: darkred"
-                label="Rejected"
-                @click="deleteMethod(props.row)"
-              />
-            </q-td>
-          </q-tr>
-        </template>
-      </q-table> -->
     </div>
     <div v-else class="flex flex-center">
       <!-- display circular progress -->
@@ -166,12 +142,17 @@ export default {
       dataReady: false,
       storeLogUser: useLoginUserStore(),
       showDialog: false,
+      totalValue: null,
+      date: null,
       dialog: {
         icon: "",
         msg: "",
         btnType: "",
         iconColor: "",
       },
+      sumTotals: [],
+      rejectCounts: [],
+      pendingCounts: [],
       rows: [],
       columns: [
         {
@@ -224,6 +205,48 @@ export default {
       this.dialog.msg = err;
       this.dialog.btnType = "Error";
     },
+    getDate() {
+      var time = new Date;
+      this.date = time.getDate() + '/' + (time.getMonth() + 1) + '/' + time.getDate()
+    },
+    getTotalSum() {
+      
+      this.$api
+      .get("/park/totalsum")
+      .then((res) => {
+        if(res.status == 200) {
+          this.sumTotals = res.data
+        }
+      })
+      .catch((err)=> {
+        console.log(err)
+      })
+    },
+    getPending() {
+      
+      this.$api
+      .get("/park/pending")
+      .then((res) => {
+        if(res.status == 200) {
+          this.pendingCounts = res.data
+        }
+      })
+      .catch((err)=> {
+        console.log(err)
+      })
+    },getReject() {
+      
+      this.$api
+      .get("/park/rejected")
+      .then((res) => {
+        if(res.status == 200) {
+          this.rejectCounts = res.data
+        }
+      })
+      .catch((err)=> {
+        console.log(err)
+      })
+    },
     getAllUsers() {
       this.$api
         .get("/payment/fees")
@@ -239,83 +262,42 @@ export default {
             message: "Unauthorized",
           });
         });
-      
     },
     editRecord(record) {
       // console.log(record);
       this.input = record;
       this.form_edit = true;
     },
-    //   onRejected(rejectedEntries) {
-    //     let msg;
-    //     if (rejectedEntries[0].failedPropValidation == "accept")
-    //       msg = "Only images (jpg, jpeg, png) are allowed.";
-    //     else if (rejectedEntries[0].failedPropValidation == "max-file-size")
-    //       msg = "File size cannot be larger than 1MB.";
-    //     Notify.create({
-    //       type: "negative",
-    //       message: msg,
-    //     });
-    //   },
 
     onCancelEdit() {
       this.getAllUsers();
     },
     onEdit() {
-      // if (this.uploadFile == "") this.uploadFile = null;
-      // if (this.uploadFile) {
-      //   //user changed avartar
-      //   const formData = new FormData();
-      //   formData.append("singlefile", this.uploadFile);
-      //   this.$api
-      //     .post("/file/upload", formData)
-      //     .then((res) => {
-      //       if (res.status == 200) {
-      //         //continue submit form data to API
-      //         this.submitEditData(res.data.uploadFileName);
-      //         this.uploadFile = null;
-      //       }
-      //     })
-      //     .catch((err) => {
-      //       console.log(err);
-      //       this.showDialog(err);
-      //     });
-      // } else {
-      //user did not change avartar, submit form data to API
       this.submitEditData();
-      // }
-      // console.log("call getalluser")
+
       this.getAllUsers();
     },
     submitEditData() {
-      // let img = "";
-      // if (filename == null) {
-      //   if (this.input.img == null) img = null;
-      //   else img = this.getFileName(this.input.img);
-      // } else img = filename;
       const data = {
         hourly: this.input.hourly,
         daily: this.input.daily,
         monthly: this.input.monthly,
       };
       console.log("sumit data: " + data);
-      // const headers = {
-      //   "x-access-token": this.storeLogUser.accessToken,
-      // };
+
       this.$api
         .put("/payment/" + this.input.id, data)
         .then((res) => {
           if (res.status == 200) {
             Notify.create({
               type: "positive",
-              message: "Updated user ID: " + res.data.id,
+              message: "Updated Payment : " + res.data.id,
             });
             // if (this.storeLogUser.userid == res.data.id) {
-              this.storeLogUser.hourly = res.data.hourly;
-              this.storeLogUser.daily = res.data.daily;
-              this.storeLogUser.monthly = res.data.monthly;
+            this.storeLogUser.hourly = res.data.hourly;
+            this.storeLogUser.daily = res.data.daily;
+            this.storeLogUser.monthly = res.data.monthly;
             // }
-
           }
         })
         .catch((err) => {
@@ -323,46 +305,23 @@ export default {
           this.showDialog(err);
         });
     },
-    //   getFileName(filePath) {
-    //     return filePath.substr(filePath.lastIndexOf("/") + 1);
-    //   },
-    //   deleteRecord(record) {
-    //     this.input = record;
-    //     this.form_del = true;
-    //   },
-    //   onDelete() {
-    //     const headers = {
-    //       "x-access-token": this.storeLogUser.accessToken,
-    //     };
-    //     this.$api
-    //       .delete("/auth/" + this.input.id, { headers })
-    //       .then((res) => {
-    //         if (res.status == 200) {
-    //           Notify.create({
-    //             type: "positive",
-    //             message: "Deleted user ID: " + res.data.id,
-    //           });
-    //           if (this.storeLogUser.userid == res.data.id) {
-    //             this.storeLogUser.clearStorage();
-    //             this.$router.push("/");
-    //           } else {
-    //             // console.log("call")
-    //             this.getAllUsers();
-    //           }
-    //         }
-    //       })
-    //       .catch((err) => {
-    //         console.log(err);
-    //         this.showErrDialog(err);
-    //       });
-    //   },
-    // },
   },
   async mounted() {
     await this.getAllUsers();
+    await this.getTotalSum();
+    await this.getDate();
+    await this.getPending();
+    await this.getReject();
     this.dataReady = true;
   },
 };
 </script>
 
-<style></style>
+<style lang="sass"  >
+.mycard
+  margin-left: auto
+  margin-right: auto
+  width: 100%
+  max-width: 200px
+  background: yellow
+</style>

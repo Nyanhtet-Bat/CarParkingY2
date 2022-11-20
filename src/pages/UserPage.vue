@@ -3,7 +3,7 @@
     <div v-if="dataReady">
       <!-- display qtable -->
       <q-table
-        title="List of Users"
+        title="User History"
         :rows="rows"
         :columns="columns"
         row-key="id"
@@ -89,7 +89,7 @@ export default defineComponent({
           res.data.forEach((item, key) => {
             if(item.userid == this.storeLogUser.getUserId){
               this.rows.push(item)
-            }
+            } 
           })
         }
       }
@@ -100,8 +100,8 @@ export default defineComponent({
             type: "negative",
             message: "Unauthorized",
           });
-          this.storeLogUser.clearStorage();
-          this.$router.push("/");
+          // this.storeLogUser.clearStorage();
+          // this.$router.push("/");
         })
       
     },

@@ -101,7 +101,7 @@ export default {
           else{
             this.storeLogUser.avatar = "default-avatar.png"
           }
-          this.$router.push("/user")
+          this.$router.push("/listuser")
         }
       })
       .catch((err)=>{

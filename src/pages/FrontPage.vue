@@ -2,8 +2,8 @@
   <div>
     <!-- <HeaderComp></HeaderComp> -->
     <q-page class="column items-center">
-      <div class="text-weight-bold transparent">Reserve your place here</div>
-      <div>We are here to make things easier.</div>
+      <h1 class="text-weight-bold transparent">Reserve your place here</h1>
+      <h3>We are here to make things easier.</h3>
 
       <q-form @submit.prevent="onSubmit" class="q-gutter-md" ref="myLoginForm">
         <!-- q date 1 -->
@@ -83,16 +83,22 @@
         </div>
 
         <div align="center">
+          <div>Select Your Payment</div>
+          <select v-model="paymentSelect">
+            <option
+              v-for="service in services"
+              :key="service.id"
+              :value="service"
+            >
+              {{ service.name }}
+            </option>
+          </select>
+        </div>
+
+        <div align="center">
           <q-btn color="deep-orange" glossy label="Check Out" type="submit" />
         </div>
       </q-form>
-
-      <q-table
-        title="Customer Details"
-        :rows="rows"
-        :columns="columns"
-        row-key="id"
-      />
 
       <q-dialog v-model="payment" persistent>
         <q-card>
@@ -152,6 +158,8 @@ export default defineComponent({
       rows: [],
       fees: null,
       payment: false,
+      paymentSelect: {},
+      services: [],
       options: ["Credit Card", "QR code", "Pay by Cash"],
 
       columns: [
@@ -164,8 +172,28 @@ export default defineComponent({
     };
   },
   methods: {
+    getMethodData() {
+      this.$api
+        .get("/method/all")
+        .then((res) => {
+          if (res.status == 200) {
+            this.rows = res.data;
+            // console.log(res.data)
+            this.services = res.data;
+            console.log(this.services);
+          }
+        })
+        .catch((err) => {
+          Notify.create({
+            type: "negative",
+            message: "Unauthorized",
+          });
+        });
+    },
+
     onSubmit() {
       // let fees = null;
+      let testNum = 1;
       const parkindate = new Date(this.date1);
       const parkoutdate = new Date(this.date2);
       const oneDay = 24 * 60 * 60 * 1000; //hours * minutes * seconds * mili
@@ -175,42 +203,9 @@ export default defineComponent({
       let monthdiff = parseInt(datediff / 30);
       let daydiff = datediff;
 
-      // let hourly = null;
-      // let daily = null;
-      // let monthly = null;
-      // let hourly = 2
       let hourly = this.storeLogUser.hourly;
       let daily = this.storeLogUser.getDaily;
       let monthly = this.storeLogUser.getMonthly;
-      // if (
-      //   this.storeLogUser.getHourly == null ||
-      //   this.storeLogUser.getDaily == null ||
-      //   this.storeLogUser.getMonthly == null
-      // ) {
-      //   hourly = 1;
-      //   hourly = this.storeLogUser.hourly;
-      //   daily = 10;
-      //   this.storeLogUser.daily = daily;
-      //   monthly = 100;
-      //   this.storeLogUser.monthly = monthly;
-      // } 
-
-
-      // if (this.storeLogUser.getDaily != null) {
-      //   daily = this.storeLogUser.getDaily;
-
-      // } else {
-      //   daily = 10;
-      //   this.storeLogUser.daily = daily;
-      // }
-
-      // if (this.storeLogUser.getMonthly != null) {
-      //   monthly = this.storeLogUser.getMonthly;
-
-      // } else {
-      //   monthly = 100;
-      //   monthly = this.storeLogUser.monthly;
-      // }
 
       let hourdiff = parkoutdate.getHours() - parkindate.getHours();
       if (monthdiff > 0) {
@@ -221,17 +216,7 @@ export default defineComponent({
         } else if (daydiff == 0) {
           if (hourdiff > 0) {
             this.fees = hourdiff * hourly;
-          } 
-          // else if (hourdiff <= 4 && hourdiff > 3) {
-          //   this.fees = 2.5;
-          // } else if (hourdiff <= 3 && hourdiff > 2) {
-          //   this.fees = 2.0;
-          // } else if (hourdiff <= 2 && hourdiff > 1) {
-          //   this.fees = 1.5;
-          // } else if (hourdiff <= 1 && hourdiff > 0) {
-          //   this.fees = 1.0;
-          // } 
-          else {
+          } else {
             Notify.create({
               type: negative,
               message: "Please enter valid hour",
@@ -244,16 +229,8 @@ export default defineComponent({
           message: "Please enter valid date",
         });
       }
-      // console.log(hourly);
-      // console.log(daily);
-      // console.log(monthly);
-      // // console.log(this.storeLogUser.hourly);
-      // console.log(this.storeLogUser.getHourly);
-      // console.log(this.storeLogUser.getDaily);
-      // console.log(this.storeLogUser.getMonthly);
-      // console.log(this.fees);
-      // console.log(datediff)
-      // console.log(milidate)
+
+      // console.log(this.storeLogUser.getUserId)
 
       if (this.fees != null) {
         const data = {
@@ -261,7 +238,6 @@ export default defineComponent({
           parkout: parkoutdate,
           fees: this.fees,
           status: "Pending",
-          // id: this.id,
           userid: this.storeLogUser.userid,
         };
         this.$api
@@ -275,26 +251,27 @@ export default defineComponent({
             console.log(err);
           });
         console.log(data);
-
-        // this.rows.push({
-        //   id: this.id++,
-        //   date1: parkindate,
-        //   date2: parkoutdate,
-        //   // fee: fees,
-        //   // userid : this.userid
-        // });
-        // this.storeCustomer.date = this.date;
-
-        // this.storeCustomer.parkin = this.date1;
-        // this.storeCustomer.parkout = this.date2;
-        // this.storeCustomer.fees = fees;
+      } else {
+        Notify.create({
+          type: "Negative",
+          message: "Please select valid date",
+        });
       }
     },
-    // optionfn(date1) {
-    //   return date1 >= Date.now();
-    // },
+  },
+  async mounted() {
+    await this.getMethodData();
+    this.dataReady = true;
   },
 });
 </script>
 
-<style></style>
+<style>
+select {
+  width: 260px;
+  padding: 16px 18px;
+  border: none;
+  border-radius: 4px;
+  background-color: #f1f1f1;
+}
+</style>
