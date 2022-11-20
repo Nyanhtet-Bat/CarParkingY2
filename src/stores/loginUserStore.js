@@ -6,6 +6,10 @@ export const useLoginUserStore = defineStore("loginuser", {
     fullname: useStorage("fullname", ""),
     accessToken: useStorage("accessToken", ""),
     avatar: useStorage("avatar", ""),
+    hourly: useStorage("hourly", ""),
+    daily: useStorage("daily", ""),
+    monthly: useStorage("monthly", ""),
+    paymentInfo: []
   }),
   getters: {
     getUserId: (state) => {
@@ -20,6 +24,15 @@ export const useLoginUserStore = defineStore("loginuser", {
     getAvatar: (state) => {
       return state.avatar;
     },
+    getHourly: (state)=>{
+      return state.hourly
+    },
+    getDaily: (state)=>{
+      return state.daily
+    },
+    getMonthly: (state)=>{
+      return state.monthly
+    }
   },
   actions: {
     clearStorage() {

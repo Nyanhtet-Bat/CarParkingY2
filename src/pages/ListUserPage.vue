@@ -219,6 +219,8 @@ export default {
           this.storeLogUser.clearStorage();
           this.$router.push("/");
         });
+
+        
     },
     editRecord(record) {
       // console.log(record);

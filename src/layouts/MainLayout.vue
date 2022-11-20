@@ -66,7 +66,37 @@ const linksList = [
     title: "List",
     caption: "Retrive all users",
     icon: "people_outline",
+    link: "/listuser",
+  },
+  {
+    title: "Booking",
+    caption: "Booked Your Space",
+    icon: "menu_book",
+    link: "/front",
+  },
+  {
+    title: "History",
+    caption: "History",
+    icon: "history",
     link: "/user",
+  },
+  {
+    title: "Admin",
+    caption: "Admin",
+    icon: "admin_panel_settings",
+    link: "/admin",
+  },
+  {
+    title: "Payment",
+    caption: "Payment",
+    icon: "payments",
+    link: "/payment",
+  },
+  {
+    title: "Method",
+    caption: "Method",
+    icon: "credit_card",
+    link: "/method",
   }
 ];
 

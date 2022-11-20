@@ -1,51 +1,116 @@
 <template>
-  <q-table
-    title="Customer Details"
-    :rows="customers"
-    :columns="columns"
-    row-key="id"
-  />
+  <q-page padding>
+    <div v-if="dataReady">
+      <!-- display qtable -->
+      <q-table
+        title="List of Users"
+        :rows="rows"
+        :columns="columns"
+        row-key="id"
+        :pagination="paginations"
+      >
+        <template #body="props">
+          <q-tr :props="props">
+            <q-td key="id" :props="props">
+              {{ props.row.id }}
+            </q-td>
+            <q-td key="parkindate" :props="props">
+              {{ props.row.parkindate }}
+            </q-td>
+            <q-td key="parkoutdate" :props="props">
+              {{ props.row.parkoutdate }}
+            </q-td>
+            <q-td key="fees" :props="props">
+              {{ props.row.fees }}
+            </q-td>
+            <q-td key="userid" :props="props">
+              {{ props.row.userid }}
+            </q-td>
+            <q-td key="status" :props="props">
+              {{ props.row.status }}
+            </q-td>
+          </q-tr>
+        </template>
+      </q-table>
+    </div>
+    <div v-else class="flex flex-center">
+      <!-- display circular progress -->
+      <q-circular-progress
+        indeterminate
+        size="90px"
+        color="lime"
+        center-color="grey-8"
+        track-color="transparent"
+        class="q-ma-md"
+      />
+    </div>
+  </q-page>
 </template>
 
 <script>
 import { defineComponent } from "vue";
-import { customerSubmitStore } from "../stores/customerdataStore.js"
+import { Notify } from "quasar";
+import { customerSubmitStore } from "../stores/customerdataStore.js";
+import { useLoginUserStore } from "../stores/loginUserStore"
 
 export default defineComponent({
   name: "UserPage",
   data() {
     return {
+      dataReady: false,
       id: 1,
       date: "2021-08-12",
-      model: null,
-      time: null,
-      customers: [],
-      options: [
-        { label: "1 hour   :   $1.00", hour: "1", fees: "$1.00" },
-        { label: "2 hour   :   $1.50", hour: "2", fees: "$1.50" },
-        { label: "3 hour   :   $2.00", hour: "3", fees: "$2.00" },
-        { label: "4 hour   :   $2.50", hour: "4", fees: "$2.50" },
-        { label: "All day   :   $3.00", hour: "All Day", fees: "$3.00" },
-        { label: "Quaterly   :   $115.00", hour: "Quaterly", fees: "$115.00" },
-      ],
+      storeLogUser: useLoginUserStore(),
+      // model: null,
+      // time: null,
+      paginations: { rowsPerPage: 10 },
+      rows: [],
+      
       columns: [
         { name: "id", label: "ID", field: "id" },
-        { name: "date", label: "Date", field: "date" },
-        { name: "time", label: "Time", field: "time" },
-        { name: "fee", label: "Fee", field: "fee" },
+        { name: "parkindate", label: "In Date", field: "parkindate" },
+        { name: "parkoutdate", label: "Out Date", field: "parkoutdate" },
+        { name: "fees", label: "Fees", field: "fees" },
+        {
+          name: "status",
+          label: "Status",
+          align: "left",
+          field: "status",
+        },
       ],
       storeCustomer: customerSubmitStore(),
     };
   },
   methods: {
-    onSubmit() {
+    getParkData() {
+      this.$api.get("/park/all")
+      .then((res) => {
+        if(res.status == 200) {
+          res.data.forEach((item, key) => {
+            if(item.userid == this.storeLogUser.getUserId){
+              this.rows.push(item)
+            }
+          })
+        }
+      }
+        
+      )
+      .catch((err) => {
+          Notify.create({
+            type: "negative",
+            message: "Unauthorized",
+          });
+          this.storeLogUser.clearStorage();
+          this.$router.push("/");
+        })
       
-      this.storeCustomer.date = this.date;
-
-      this.storeCustomer.time = this.time.hour;
-      this.storeCustomer.fees = this.time.fee;
     },
   },
+
+  async mounted() {
+    await this.getParkData();
+    this.dataReady = true;
+  }
 });
 </script>
 
