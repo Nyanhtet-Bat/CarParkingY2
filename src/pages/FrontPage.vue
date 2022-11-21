@@ -192,8 +192,9 @@ export default defineComponent({
     },
 
     onSubmit() {
-      // let fees = null;
-      let testNum = 1;
+      
+      var time = new Date;
+      const dateNow = time.getFullYear() + '-' + (time.getMonth() + 1) + '-' + time.getDate() 
       const parkindate = new Date(this.date1);
       const parkoutdate = new Date(this.date2);
       const oneDay = 24 * 60 * 60 * 1000; //hours * minutes * seconds * mili
@@ -239,12 +240,17 @@ export default defineComponent({
           fees: this.fees,
           status: "Pending",
           userid: this.storeLogUser.userid,
+          date: dateNow
         };
         this.$api
           .post("/park/detail", data)
           .then((res) => {
             if (res.status == 200) {
               console.log(res.data);
+              Notify.create({
+                type : "positive",
+                message: "Your transaction has been created."
+              })
             }
           })
           .catch((err) => {

@@ -1,9 +1,11 @@
 <template>
   <q-page padding>
+    <h3>Registered User Only</h3>
     <div v-if="dataReady">
       <!-- display qtable -->
+
       <q-table
-        title="User History"
+        title="User Purchase History"
         :rows="rows"
         :columns="columns"
         row-key="id"

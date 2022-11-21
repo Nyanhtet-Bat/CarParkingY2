@@ -7,7 +7,8 @@ import axios from 'axios'
 // good idea to move this instance creation inside of the
 // "export default () => {}" function below (which runs individually
 // for each client)
-const RESTURL = "http://localhost:3000/api"
+const RESTURL = "https://warm-fjord-36227.herokuapp.com/api"
+// const RESTURL = "http://localhost:3000/api"
 const api = axios.create({ 
   baseURL:  RESTURL,
   headers:{ "Content-type" : "application/json" }

@@ -207,7 +207,7 @@ export default {
     },
     getDate() {
       var time = new Date;
-      this.date = time.getDate() + '/' + (time.getMonth() + 1) + '/' + time.getDate()
+      this.date = time.getDate() + '/' + (time.getMonth() + 1) + '/' + time.getFullYear()
     },
     getTotalSum() {
       
