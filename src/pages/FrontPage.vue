@@ -174,7 +174,7 @@ export default defineComponent({
   methods: {
     getMethodData() {
       this.$api
-        .get("/method/all")
+        .get("/method/visible")
         .then((res) => {
           if (res.status == 200) {
             this.rows = res.data;

@@ -2,6 +2,8 @@
   <q-page padding>
     <div>
       <q-input v-model="method_name" type="text" label="Method Name" />
+      <q-input v-model="method_visible" type="text" label="Method Status" />
+      
       <br />
       <q-btn color="primary" icon="check" label="Add" @click="onClick" />
     </div>
@@ -23,6 +25,10 @@
 
             <q-td key="name" :props="props">
               {{ props.row.name }}
+            </q-td>
+
+            <q-td key="visible" :props="props">
+              {{ props.row.visible }}
             </q-td>
 
             <q-td key="actions">
@@ -56,7 +62,8 @@
             <span class="q-ml-sm text-h6"> Edit Method ID: {{ input.id }} </span>
           </q-card-section>
           <q-card-section>
-            <q-input v-model="input.name" type="text" label="hourly" />
+            <q-input v-model="input.name" type="text" label="Method Name" />
+            <q-input v-model="input.visible" type="text" label="Method status" />
 
             <!-- 1048576 = 1MB -->
           </q-card-section>
@@ -89,7 +96,7 @@
             </span>
           </q-card-section>
           <q-card-section>
-            <span class="q-ml-sm"> Fullname: {{ input.fullname }} </span>
+            <span class="q-ml-sm"> Method: {{ input.name }} </span>
           </q-card-section>
           <q-card-actions align="right">
             <q-btn flat label="NO" color="primary" v-close-popup />
@@ -108,7 +115,9 @@
 </template>
 
 <script>
+import { Notify } from "quasar"
 export default {
+  
   name: "ListUserPage",
   // components: { DialogComponent },
   data() {
@@ -117,6 +126,7 @@ export default {
       // storeLogUser: useLoginUserStore(),
       showDialog: false,
       method_name: "",
+      method_visible: "",
       dialog: {
         icon: "",
         msg: "",
@@ -140,6 +150,13 @@ export default {
           field: "name",
           sortable: true,
         },
+        {
+          name: "visible",
+          label: "Visible",
+          align: "left",
+          field: "visible",
+          sortable: true,
+        },
 
         {
           name: "actions",
@@ -159,7 +176,9 @@ export default {
     onClick() {
       const data = {
         name: this.method_name,
+        visible: this.method_visible
       };
+      console.log(data)
       this.$api
         .post("/method/add", data)
         .then((res) => {
@@ -169,7 +188,7 @@ export default {
             
             Notify.create({
             type: "positive",
-            message: "Update Method Successfully.",
+            message: "Add Method Successfully.",
           });
           }
         })
@@ -209,6 +228,7 @@ export default {
     submitEditData() {
       const data = {
         name: this.input.name,
+        visible: this.input.visible
       };
       console.log("submit data: " + data);
       this.$api
