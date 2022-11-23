@@ -1,8 +1,8 @@
 {
   "name": "webdataproject",
   "version": "0.0.1",
-  "description": "This is about laptop renting webpage",
-  "productName": "Laptop Rent",
+  "description": "This is about car parking webpage",
+  "productName": "Car Parking",
   "author": "LinNi",
   "private": true,
   "scripts": {
