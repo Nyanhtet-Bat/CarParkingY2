@@ -17,7 +17,7 @@
                   transition-show="scale"
                   transition-hide="scale"
                 >
-                  <q-date v-model="date1" mask="YYYY-MM-DD HH:mm">
+                  <q-date v-model="date1" mask="YYYY-MM-DD HH:mm" :options="optionsFn">
                     <div class="row items-center justify-end">
                       <q-btn v-close-popup label="Close" color="primary" flat />
                     </div>
@@ -55,7 +55,7 @@
                   transition-show="scale"
                   transition-hide="scale"
                 >
-                  <q-date v-model="date2" mask="YYYY-MM-DD HH:mm">
+                  <q-date v-model="date2" mask="YYYY-MM-DD HH:mm" :options="optionsFn">
                     <div class="row items-center justify-end">
                       <q-btn v-close-popup label="Close" color="primary" flat />
                     </div>
@@ -143,6 +143,7 @@ import { defineComponent } from "vue";
 import { customerSubmitStore } from "../stores/customerdataStore.js";
 import { Notify } from "quasar";
 import { useLoginUserStore } from "../stores/loginUserStore.js";
+import { date } from "quasar";
 
 export default defineComponent({
   name: "FrontPage",
@@ -151,8 +152,8 @@ export default defineComponent({
   data() {
     return {
       storeLogUser: useLoginUserStore(),
-      date1: "2022-02-01 12:44",
-      date2: "2022-03-01 13:30",
+      date1: "2022-11-25 13:30",
+      date2: "2022-11-25 14:30",
       model: null,
       time: null,
       rows: [],
@@ -161,6 +162,9 @@ export default defineComponent({
       paymentSelect: {},
       services: [],
       options: ["Credit Card", "QR code", "Pay by Cash"],
+      optionsFn(d) {
+        return d >= date.formatDate(Date.now(), "YYYY/MM/DD");
+      },
 
       columns: [
         { name: "id", label: "ID", field: "id" },
@@ -192,9 +196,9 @@ export default defineComponent({
     },
 
     onSubmit() {
-      
-      var time = new Date;
-      const dateNow = time.getFullYear() + '-' + (time.getMonth() + 1) + '-' + time.getDate() 
+      var time = new Date();
+      const dateNow =
+        time.getFullYear() + "-" + (time.getMonth() + 1) + "-" + time.getDate();
       const parkindate = new Date(this.date1);
       const parkoutdate = new Date(this.date2);
       const oneDay = 24 * 60 * 60 * 1000; //hours * minutes * seconds * mili
@@ -240,7 +244,7 @@ export default defineComponent({
           fees: this.fees,
           status: "Pending",
           userid: this.storeLogUser.userid,
-          date: dateNow
+          date: dateNow,
         };
         this.$api
           .post("/park/detail", data)
@@ -248,9 +252,9 @@ export default defineComponent({
             if (res.status == 200) {
               console.log(res.data);
               Notify.create({
-                type : "positive",
-                message: "Your transaction has been created."
-              })
+                type: "positive",
+                message: "Your transaction has been created.",
+              });
             }
           })
           .catch((err) => {
