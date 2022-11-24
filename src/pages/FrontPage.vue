@@ -162,8 +162,9 @@ export default defineComponent({
       paymentSelect: {},
       services: [],
       options: ["Credit Card", "QR code", "Pay by Cash"],
-      optionsFn(d) {
-        return d >= date.formatDate(Date.now(), "YYYY/MM/DD");
+      optionsFn(date) {
+        return date >= date.formatDate(Date.now(), "YYYY/MM/DD");
+        
       },
 
       columns: [
